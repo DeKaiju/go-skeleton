@@ -3,9 +3,9 @@ package commons
 import (
 	"crypto/tls"
 
-	"github.com/armnerd/go-skeleton/config"
-
 	"gopkg.in/gomail.v2"
+
+	"github.com/dekaiju/go-skeleton/config"
 )
 
 func SendMail(subject string, body string, mailTo ...string) error {

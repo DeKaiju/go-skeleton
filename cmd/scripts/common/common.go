@@ -3,10 +3,11 @@ package common
 import (
 	"os"
 
-	"github.com/armnerd/go-skeleton/config"
-	"github.com/armnerd/go-skeleton/pkg/mysql"
-	"github.com/armnerd/go-skeleton/pkg/redis"
 	"github.com/joho/godotenv"
+
+	"github.com/dekaiju/go-skeleton/config"
+	"github.com/dekaiju/go-skeleton/pkg/mysql"
+	"github.com/dekaiju/go-skeleton/pkg/redis"
 )
 
 func Depend() {

@@ -4,8 +4,8 @@ import (
 	"errors"
 	"os"
 
-	"github.com/armnerd/go-skeleton/cmd/api"
-	"github.com/armnerd/go-skeleton/cmd/scripts"
+	"github.com/dekaiju/go-skeleton/cmd/api"
+	"github.com/dekaiju/go-skeleton/cmd/scripts"
 
 	"github.com/spf13/cobra"
 )
@@ -24,8 +24,8 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(api.Server)       // 接口服务
-	rootCmd.AddCommand(scripts.Register) // 脚本入口
+	rootCmd.AddCommand(api.Server)
+	rootCmd.AddCommand(scripts.Register)
 }
 
 func Execute() {

@@ -3,7 +3,7 @@ package curl
 import (
 	"testing"
 
-	"github.com/armnerd/go-skeleton/pkg/curl"
+	"github.com/dekaiju/go-skeleton/pkg/curl"
 	"github.com/gin-gonic/gin"
 	"github.com/smartystreets/goconvey/convey"
 )

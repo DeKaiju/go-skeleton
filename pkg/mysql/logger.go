@@ -1,15 +1,15 @@
 package mysql
 
 import (
+	"context"
 	"fmt"
 	"time"
 
-	syslog "github.com/armnerd/go-skeleton/pkg/log"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/utils"
 
-	"context"
+	syslog "github.com/dekaiju/go-skeleton/pkg/log"
 )
 
 type traceLogger struct {

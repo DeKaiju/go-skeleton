@@ -1,53 +1,24 @@
 # go-skeleton
 
-> Golang 脚手架，Go 简单，Go 直接
-
 ## Run
 
 ```bash
-// 配置
+// env
 cp .env.example .env
 
-// 日志
-mkdir runtime
-
-// 构建
+// build
 go build main.go
 
-// 构建时指定 CPU 核心数量
+// cpu core number
 go build -ldflags "-X main.SetCpuCount=1" main.go
 
-// 获取运行参数
-./main server -h
-
-// 开启接口服务
+// run server
 ./main server
 
-// 运行脚本
+// run script
 ./main cmd demo hello
 ./main cmd demo world
 ```
-
-## Doc
-
-* 依赖
-
-```bash
-go get -u github.com/swaggo/swag/cmd/swag@v1.6.5
-go get -u github.com/swaggo/gin-swagger@v1.2.0 
-go get -u github.com/swaggo/files
-go get -u github.com/alecthomas/template
-```
-
-* 初始化
-
-```bash
-swag init
-```
-
-* 访问
-
-http://127.0.0.1:9551/swagger/index.html
 
 ## Test
 
@@ -63,19 +34,19 @@ goconvey
 
 ## Lib
 
-|   Role   |   Package   |   Link   |
-| ---- | ---- | ---- |
-|   命令   |   cobra       |   https://github.com/spf13/cobra     |
-|   路由   |   Gin       |   https://github.com/gin-gonic/gin     |
-|   配置   |   godotenv  |   https://github.com/joho/godotenv     |
-|   ORM    |   Gorm      |   https://github.com/go-gorm/gorm      |
-|   redis  |   redigo    |   https://github.com/gomodule/redigo   |
-|   Curl   |   goz       |   https://github.com/idoubi/goz        |
-|   Json   |   gjson     |   https://github.com/tidwall/gjson     |
-|   日志   |   logrus    |   https://github.com/sirupsen/logrus   |
-|   鉴权   |   jwt-go    |   https://github.com/golang-jwt/jwt  |
-|   文档   |   gin-swagger    |   https://github.com/swaggo/gin-swagger |
-|   测试   |   goconvey    |   https://github.com/smartystreets/goconvey |
-|   Kafka   |   kafka-go    |   https://github.com/segmentio/kafka-go  |
-|   RabbitMq   |   amqp    |   https://github.com/streadway/amqp  |
-|   Etcd   |   etcd    |   https://github.com/coreos/etcd/clientv3 |
+| Role     | Package     |   Link   |
+|----------|-------------| ---- |
+| Script   | cobra       |   https://github.com/spf13/cobra     |
+| Router   | gin         |   https://github.com/gin-gonic/gin     |
+| Env      | godotenv    |   https://github.com/joho/godotenv     |
+| ORM      | gorm        |   https://github.com/go-gorm/gorm      |
+| Redis    | redigo      |   https://github.com/gomodule/redigo   |
+| Curl     | goz         |   https://github.com/idoubi/goz        |
+| Json     | gjson       |   https://github.com/tidwall/gjson     |
+| Log      | logrus      |   https://github.com/sirupsen/logrus   |
+| JWT      | jwt-go      |   https://github.com/golang-jwt/jwt  |
+| Doc      | gin-swagger |   https://github.com/swaggo/gin-swagger |
+| Test     | goconvey    |   https://github.com/smartystreets/goconvey |
+| Kafka    | kafka-go    |   https://github.com/segmentio/kafka-go  |
+| RabbitMq | amqp        |   https://github.com/streadway/amqp  |
+| Etcd     | etcd        |   https://github.com/coreos/etcd/clientv3 |

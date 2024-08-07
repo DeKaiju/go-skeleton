@@ -6,6 +6,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
+	"gorm.io/gorm"
+
+	"github.com/dekaiju/go-skeleton/internal/data"
+	"github.com/dekaiju/go-skeleton/pkg/redis"
 )
 
 type requestHeader struct {
@@ -15,6 +19,8 @@ type requestHeader struct {
 // AuthRequired 登录验证
 func AuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		conn := redis.Get()
+		defer conn.Close()
 		// 获取header信息
 		header := requestHeader{}
 		c.BindHeader(&header)
@@ -47,17 +53,45 @@ func AuthRequired() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			if claims["user"] == nil {
+			address := claims["address"]
+			if address == nil {
 				c.JSON(200, gin.H{
 					"code":    4003,
-					"message": "auth fail: no user in claims",
+					"message": "auth fail: no address in claims",
 					"data":    "",
 				})
 				c.Abort()
 				return
 			}
-			c.Set("user", claims["user"])
+
+			// verify address exist in database
+			_, err := data.QueryUser(c, address.(string))
+			if err != nil && err == gorm.ErrRecordNotFound {
+				c.JSON(200, gin.H{
+					"code":    4003,
+					"message": "auth fail: invalid address",
+					"data":    "",
+				})
+				c.Abort()
+				return
+			}
+
+			// verify token in redis
+			//tokenString, err := redis.String(conn.Do("GET", address))
+			//if err != nil || header.Authorization != tokenString {
+			//	c.JSON(200, gin.H{
+			//		"code":    4003,
+			//		"message": "auth fail: invalid token",
+			//		"data":    "",
+			//	})
+			//	c.Abort()
+			//	return
+			//}
+
+			// store address for this context
+			c.Set("address", address)
 		} else {
 			c.JSON(200, gin.H{
 				"code":    4003,

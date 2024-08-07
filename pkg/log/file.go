@@ -8,10 +8,10 @@ import (
 	"path"
 	"time"
 
-	"github.com/armnerd/go-skeleton/config"
 	"github.com/gin-gonic/gin"
-
 	"github.com/sirupsen/logrus"
+
+	"github.com/dekaiju/go-skeleton/config"
 )
 
 var mode int

@@ -4,8 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Succuss 成功
-func Succuss(c *gin.Context, data interface{}) {
+// Success response success
+func Success(c *gin.Context, data interface{}) {
 	c.JSON(200, gin.H{
 		"code":    0,
 		"message": "",
@@ -14,11 +14,11 @@ func Succuss(c *gin.Context, data interface{}) {
 	})
 }
 
-// Fail 失败
-func Fail(c *gin.Context, code int) {
+// Fail response err message
+func Fail(c *gin.Context, err error) {
 	c.JSON(200, gin.H{
-		"code":    code,
-		"message": GetMessageByCode(code),
+		"code":    getCodeByError(err),
+		"message": err.Error(),
 		"data":    "",
 		"traceid": c.GetString("traceId"),
 	})

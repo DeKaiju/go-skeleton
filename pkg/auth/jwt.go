@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v4"
 )
 
 // GetToken 获取token
@@ -16,13 +16,13 @@ func GetToken(user int) string {
 
 	type appClaims struct {
 		User int `json:"user"`
-		jwt.StandardClaims
+		jwt.RegisteredClaims
 	}
 
 	claims := appClaims{
 		user,
-		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(expiresTime * time.Second).Unix(),
+		jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(expiresTime * time.Second)),
 		},
 	}
 

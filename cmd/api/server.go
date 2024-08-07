@@ -11,13 +11,14 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/armnerd/go-skeleton/config"
-	"github.com/armnerd/go-skeleton/internal/route"
-	"github.com/armnerd/go-skeleton/pkg/mysql"
-	"github.com/armnerd/go-skeleton/pkg/redis"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
+
+	"github.com/dekaiju/go-skeleton/config"
+	"github.com/dekaiju/go-skeleton/internal/route"
+	"github.com/dekaiju/go-skeleton/pkg/mysql"
+	"github.com/dekaiju/go-skeleton/pkg/redis"
 )
 
 var (
@@ -48,7 +49,6 @@ func welcome() {
 }
 
 func setup() {
-	// 根目录
 	config.SetAppRoot(os.Args[0])
 	// 默认配置
 	if configFile == ".env" {
