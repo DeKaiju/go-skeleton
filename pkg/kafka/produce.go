@@ -3,10 +3,11 @@ package kafka
 import (
 	"context"
 	"fmt"
-	"github.com/armnerd/go-skeleton/config"
 	"time"
 
 	"github.com/segmentio/kafka-go"
+
+	"github.com/dekaiju/go-skeleton/config"
 )
 
 func Produce(topic string, key string, value string) {

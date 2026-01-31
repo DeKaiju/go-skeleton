@@ -3,12 +3,12 @@ package redis
 import (
 	"testing"
 
-	"github.com/armnerd/go-skeleton/pkg/redis"
+	"github.com/dekaiju/go-skeleton/pkg/redis"
 	"github.com/smartystreets/goconvey/convey"
 )
 
 func TestSet(t *testing.T) {
-	convey.Convey("测试从 redis 写入数据", t, func() {
+	convey.Convey("Test write to redis", t, func() {
 		redis.GetCache()
 		defer func() {
 			redis.Get().Close()
@@ -21,7 +21,7 @@ func TestSet(t *testing.T) {
 }
 
 func TestGett(t *testing.T) {
-	convey.Convey("测试从 redis 读取数据", t, func() {
+	convey.Convey("Test read from redis", t, func() {
 		redis.GetCache()
 		defer func() {
 			redis.Get().Close()

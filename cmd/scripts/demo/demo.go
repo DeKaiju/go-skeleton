@@ -1,8 +1,9 @@
 package demo
 
 import (
-	"github.com/armnerd/go-skeleton/cmd/scripts/common"
 	"github.com/spf13/cobra"
+
+	"github.com/dekaiju/go-skeleton/cmd/scripts/common"
 )
 
 var (
@@ -33,7 +34,7 @@ var (
 )
 
 func init() {
-	// 注册子命令
+	// Register subcommands
 	Register.AddCommand(hello)
 	Register.AddCommand(world)
 }

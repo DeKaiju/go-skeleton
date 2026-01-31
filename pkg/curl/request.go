@@ -5,14 +5,14 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	syslog "github.com/armnerd/go-skeleton/pkg/log"
 	"github.com/gin-gonic/gin"
-
 	"github.com/idoubi/goz"
 	"github.com/tidwall/gjson"
+
+	syslog "github.com/dekaiju/go-skeleton/pkg/log"
 )
 
-// Get 请求
+// Get HTTP GET request
 func Get(c *gin.Context, url string, data interface{}, headers map[string]interface{}) (gjson.Result, error) {
 	var res gjson.Result
 	cli := goz.NewClient()
@@ -33,7 +33,7 @@ func Get(c *gin.Context, url string, data interface{}, headers map[string]interf
 	return res, nil
 }
 
-// PostForm 请求
+// PostForm HTTP POST form request
 func PostForm(c *gin.Context, url string, data map[string]interface{}, headers map[string]interface{}) (gjson.Result, error) {
 	var res gjson.Result
 	cli := goz.NewClient()
@@ -54,7 +54,7 @@ func PostForm(c *gin.Context, url string, data map[string]interface{}, headers m
 	return res, nil
 }
 
-// PostJson 请求
+// PostJson HTTP POST JSON request
 func PostJson(c *gin.Context, url string, data string, headers map[string]string) (gjson.Result, error) {
 	var res gjson.Result
 	req, _ := http.NewRequest("POST", url, bytes.NewBuffer([]byte(data)))

@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// RecoverAtLast 全局异常处理
+// RecoverAtLast global exception handler
 func RecoverAtLast() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {

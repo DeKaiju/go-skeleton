@@ -3,27 +3,28 @@ package common
 import (
 	"os"
 
-	"github.com/armnerd/go-skeleton/config"
-	"github.com/armnerd/go-skeleton/pkg/mysql"
-	"github.com/armnerd/go-skeleton/pkg/redis"
 	"github.com/joho/godotenv"
+
+	"github.com/dekaiju/go-skeleton/config"
+	"github.com/dekaiju/go-skeleton/pkg/mysql"
+	"github.com/dekaiju/go-skeleton/pkg/redis"
 )
 
 func Depend() {
-	// 根目录
+	// Root directory
 	config.SetAppRoot(os.Args[0])
-	// 配置
+	// Config
 	configFile := config.AppRoot + "/.env"
 	godotenv.Load(configFile)
-	// 连接池
+	// Connection pools
 	mysql.GetDB()
 	redis.GetCache()
 }
 
 func Release() {
-	// 关闭 MySQL
+	// Close MySQL
 	sqlDB, _ := mysql.DB.DB()
 	sqlDB.Close()
-	// 关闭 Redis
+	// Close Redis
 	redis.Get().Close()
 }

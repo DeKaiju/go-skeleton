@@ -3,13 +3,13 @@ package curl
 import (
 	"testing"
 
-	"github.com/armnerd/go-skeleton/pkg/curl"
+	"github.com/dekaiju/go-skeleton/pkg/curl"
 	"github.com/gin-gonic/gin"
 	"github.com/smartystreets/goconvey/convey"
 )
 
 func TestGet(t *testing.T) {
-	convey.Convey("测试 get 请求", t, func() {
+	convey.Convey("Test GET request", t, func() {
 		var c *gin.Context
 		welcome := "This is go-skeleton, build with Gin and Gorm"
 		var url = "http://127.0.0.1:9551"
@@ -23,7 +23,7 @@ func TestGet(t *testing.T) {
 }
 
 func TestPost(t *testing.T) {
-	convey.Convey("测试 post 请求", t, func() {
+	convey.Convey("Test POST request", t, func() {
 		var c *gin.Context
 		var url = "http://127.0.0.1:9551/api/article/info"
 		data := map[string]interface{}{

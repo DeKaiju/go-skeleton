@@ -11,13 +11,14 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/armnerd/go-skeleton/config"
-	"github.com/armnerd/go-skeleton/internal/route"
-	"github.com/armnerd/go-skeleton/pkg/mysql"
-	"github.com/armnerd/go-skeleton/pkg/redis"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
+
+	"github.com/dekaiju/go-skeleton/config"
+	"github.com/dekaiju/go-skeleton/internal/route"
+	"github.com/dekaiju/go-skeleton/pkg/mysql"
+	"github.com/dekaiju/go-skeleton/pkg/redis"
 )
 
 var (
@@ -48,53 +49,52 @@ func welcome() {
 }
 
 func setup() {
-	// 根目录
 	config.SetAppRoot(os.Args[0])
-	// 默认配置
+	// Default config
 	if configFile == ".env" {
 		configFile = config.AppRoot + "/.env"
 	}
 	fmt.Printf("The config file path is %s\n", configFile)
 	godotenv.Load(configFile)
 	if mode == "prod" {
-		// 生产模式
+		// Production mode
 		gin.SetMode(gin.ReleaseMode)
 	}
-	// 连接池
+	// Connection pools
 	mysql.GetDB()
 	redis.GetCache()
 }
 
 func run() error {
-	// 关闭 MySQL
+	// Close MySQL
 	defer func() {
 		sqlDB, _ := mysql.DB.DB()
 		sqlDB.Close()
 	}()
 
-	// 关闭 Redis
+	// Close Redis
 	defer func() {
 		redis.Get().Close()
 	}()
 
-	// 路由
+	// Routes
 	handler := route.Init()
 
-	// 端口
+	// Port
 	srv := &http.Server{
 		Addr:    ":" + port,
 		Handler: handler,
 	}
 	fmt.Printf("The server is running on port %s\n", port)
 
-	// 运行服务
+	// Run service
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && errors.Is(err, http.ErrServerClosed) {
 			log.Printf("listen: %s\n", err)
 		}
 	}()
 
-	// 优雅关闭
+	// Graceful shutdown
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit

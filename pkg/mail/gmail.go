@@ -3,9 +3,9 @@ package commons
 import (
 	"crypto/tls"
 
-	"github.com/armnerd/go-skeleton/config"
-
 	"gopkg.in/gomail.v2"
+
+	"github.com/dekaiju/go-skeleton/config"
 )
 
 func SendMail(subject string, body string, mailTo ...string) error {
@@ -15,9 +15,9 @@ func SendMail(subject string, body string, mailTo ...string) error {
 	}
 	m := gomail.NewMessage()
 	m.SetHeader("From", "<"+emailConfig.User+">")
-	m.SetHeader("To", mailTo...)    // 发送给多个用户
-	m.SetHeader("Subject", subject) // 设置邮件主题
-	m.SetBody("text/html", body)    // 设置邮件正文
+	m.SetHeader("To", mailTo...)    // Send to multiple users
+	m.SetHeader("Subject", subject) // Set email subject
+	m.SetBody("text/html", body)    // Set email body
 	d := gomail.NewDialer(
 		emailConfig.Host,
 		emailConfig.Port,

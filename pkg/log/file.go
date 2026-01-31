@@ -8,10 +8,10 @@ import (
 	"path"
 	"time"
 
-	"github.com/armnerd/go-skeleton/config"
 	"github.com/gin-gonic/gin"
-
 	"github.com/sirupsen/logrus"
+
+	"github.com/dekaiju/go-skeleton/config"
 )
 
 var mode int
@@ -19,7 +19,7 @@ var CONSOLE_MODE = 1
 var FILE_MODE = 2
 
 func init() {
-	// 默认输出到终端，用 ELK 收集
+	// Default output to terminal, collect with ELK
 	mode = CONSOLE_MODE
 }
 
@@ -58,7 +58,7 @@ func Panic(c *gin.Context, tag string, info interface{}) {
 	logToFile(c, logrus.PanicLevel, tag, info)
 }
 
-// 记录日志到文件
+// LogToFile records log to file
 func logToFile(c *gin.Context, level logrus.Level, tag string, something interface{}) {
 	var info string
 	switch value := something.(type) {
@@ -75,15 +75,15 @@ func logToFile(c *gin.Context, level logrus.Level, tag string, something interfa
 	}
 	var out io.Writer
 	if mode == CONSOLE_MODE {
-		// 输出终端
+		// Output to terminal
 		out = os.Stdout
 	} else if mode == FILE_MODE {
-		// 日志文件
+		// Log file
 		logFilePath := config.AppRoot + os.Getenv("LOG_FILE")
 		today := time.Now().Format("2006-01-02")
 		logFileName := today + ".log"
 		fileName := path.Join(logFilePath, logFileName)
-		// 日志文件不存在时创建
+		// Create log file if not exists
 		isExist, _ := pathExists(fileName)
 		if !isExist {
 			f, err := os.Create(fileName)
@@ -100,13 +100,13 @@ func logToFile(c *gin.Context, level logrus.Level, tag string, something interfa
 		}
 	}
 
-	// 实例
+	// Logger instance
 	logger := logrus.New()
 	logger.Out = out
 	logger.Formatter = &logrus.JSONFormatter{}
 	logger.SetLevel(logrus.DebugLevel)
 
-	// 记录日志
+	// Record log
 	app := os.Getenv("APP_NAME")
 	server := os.Getenv("SERVER_NUM")
 	field := logrus.Fields{
@@ -131,7 +131,7 @@ func logToFile(c *gin.Context, level logrus.Level, tag string, something interfa
 	}
 }
 
-// 判断文件是否存在
+// Check if file exists
 func pathExists(path string) (bool, error) {
 	_, err := os.Stat(path)
 	if err == nil {

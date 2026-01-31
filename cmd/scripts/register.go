@@ -1,8 +1,9 @@
 package scripts
 
 import (
-	"github.com/armnerd/go-skeleton/cmd/scripts/demo"
 	"github.com/spf13/cobra"
+
+	"github.com/dekaiju/go-skeleton/cmd/scripts/demo"
 )
 
 var (

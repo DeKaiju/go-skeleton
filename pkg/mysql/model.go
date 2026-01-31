@@ -9,16 +9,15 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm/logger"
-
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
-// DB mysql连接池
+// DB mysql connection pool
 var DB *gorm.DB
 
-// GetDB 连接数据库
+// GetDB connects to database
 func GetDB() {
 	DB = connectDbMySQL(
 		os.Getenv("DB_HOST"),
@@ -35,7 +34,7 @@ func GetDB() {
 	sqlDB.SetMaxIdleConns(openConnections)
 }
 
-// 初始化Mysql db
+// InitializeMysqlDB initializes mysql database
 func connectDbMySQL(host, port, database, user, pass, charset string) *gorm.DB {
 	dns := fmt.Sprintf(
 		"%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local",
@@ -56,12 +55,12 @@ func connectDbMySQL(host, port, database, user, pass, charset string) *gorm.DB {
 	return db
 }
 
-// 获取实例
+// GetInstance returns database instance
 func Instance(c *gin.Context) *gorm.DB {
 	return DB.WithContext(Gin2Context(c))
 }
 
-// 追加 traceId
+// Append traceId to context
 func Gin2Context(c *gin.Context) context.Context {
 	return context.WithValue(context.Background(), "traceId", c.GetString("traceId"))
 }

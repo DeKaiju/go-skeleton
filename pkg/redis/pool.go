@@ -8,10 +8,10 @@ import (
 	"github.com/gomodule/redigo/redis"
 )
 
-// redis连接池
+// Redis connection pool
 var pool *redis.Pool
 
-// GetCache 获取缓存池
+// GetCache initializes cache pool
 func GetCache() {
 	host := os.Getenv("CACHE_HOST")
 	port := os.Getenv("CACHE_PORT")
@@ -33,7 +33,7 @@ func GetCache() {
 			if err != nil {
 				return nil, err
 			}
-			// 鉴权
+			// Authentication
 			if pass != "" {
 				if _, err := c.Do("AUTH", pass); err != nil {
 					c.Close()

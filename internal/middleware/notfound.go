@@ -2,7 +2,7 @@ package middleware
 
 import "github.com/gin-gonic/gin"
 
-// NotFound 接口不存在
+// NotFound handles 404
 func NotFound() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.JSON(404, gin.H{
