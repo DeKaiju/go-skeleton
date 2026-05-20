@@ -2,14 +2,16 @@ package mysql
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
-	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/utils"
 
-	syslog "github.com/dekaiju/go-skeleton/pkg/log"
+	"github.com/dekaiju/go-skeleton/types"
 )
 
 type traceLogger struct {
@@ -18,7 +20,6 @@ type traceLogger struct {
 	Colorful      bool
 }
 
-// Custom logger
 func NewTraceLogger(logLevel logger.LogLevel, slowThreshold time.Duration) *traceLogger {
 	l := &traceLogger{}
 	l.LogLevel = logLevel
@@ -27,93 +28,83 @@ func NewTraceLogger(logLevel logger.LogLevel, slowThreshold time.Duration) *trac
 	return l
 }
 
-// LogMode log mode
 func (l *traceLogger) LogMode(level logger.LogLevel) logger.Interface {
-	newlogger := *l
-	newlogger.LogLevel = level
-	return &newlogger
+	newLogger := *l
+	newLogger.LogLevel = level
+	return &newLogger
 }
 
-// Info print info
 func (l traceLogger) Info(ctx context.Context, msg string, data ...interface{}) {
 	if l.LogLevel >= logger.Info {
 		output := append([]interface{}{utils.FileWithLineNum()}, data...)
-		output = append(output, ctx.Value("traceId"))
-		fmt.Printf(msg, output...)
+		output = append(output, ctx.Value(types.ContextTraceID))
+		logrus.Printf(msg, output...)
 	}
 }
 
-// Warn print warn messages
 func (l traceLogger) Warn(ctx context.Context, msg string, data ...interface{}) {
 	if l.LogLevel >= logger.Warn {
 		output := append([]interface{}{utils.FileWithLineNum()}, data...)
-		output = append(output, ctx.Value("traceId"))
-		fmt.Printf(msg, output...)
+		output = append(output, ctx.Value(types.ContextTraceID))
+		logrus.Printf(msg, output...)
 	}
 }
 
-// Error print error messages
 func (l traceLogger) Error(ctx context.Context, msg string, data ...interface{}) {
 	if l.LogLevel >= logger.Error {
 		output := append([]interface{}{utils.FileWithLineNum()}, data...)
-		output = append(output, ctx.Value("traceId"))
-		fmt.Printf(msg, output...)
+		output = append(output, ctx.Value(types.ContextTraceID))
+		logrus.Printf(msg, output...)
 	}
 }
 
-// Trace print sql message
 func (l traceLogger) Trace(ctx context.Context, begin time.Time, fc func() (string, int64), err error) {
-	if l.LogLevel > 0 {
-		elapsed := time.Since(begin)
-		switch {
-		case err != nil && l.LogLevel >= logger.Error:
-			sql, rows := fc()
-			c := &gin.Context{}
-			c.Set("traceId", ctx.Value("traceId"))
-			info := make(map[string]interface{})
-			info["file"] = utils.FileWithLineNum()
-			info["error"] = err
-			info["time"] = float64(elapsed.Nanoseconds()) / 1e6
-			info["sql"] = sql
-			if rows == -1 {
-				info["rows"] = "-"
-				syslog.Error(c, "Sql Error", info)
-			} else {
-				info["rows"] = rows
-				syslog.Error(c, "Sql Error", info)
-			}
-		case elapsed > l.SlowThreshold && l.SlowThreshold != 0 && l.LogLevel >= logger.Warn:
-			sql, rows := fc()
-			c := &gin.Context{}
-			c.Set("traceId", ctx.Value("traceId"))
-			info := make(map[string]interface{})
-			info["file"] = utils.FileWithLineNum()
-			info["error"] = fmt.Sprintf("SLOW SQL >= %v", l.SlowThreshold)
-			info["time"] = float64(elapsed.Nanoseconds()) / 1e6
-			info["sql"] = sql
-			if rows == -1 {
-				info["rows"] = "-"
-				syslog.Warn(c, "Sql Slow", info)
-			} else {
-				info["rows"] = rows
-				syslog.Warn(c, "Sql Slow", info)
-			}
-		case l.LogLevel >= logger.Info:
-			sql, rows := fc()
-			c := &gin.Context{}
-			c.Set("traceId", ctx.Value("traceId"))
-			info := make(map[string]interface{})
-			info["file"] = utils.FileWithLineNum()
-			info["error"] = ""
-			info["time"] = float64(elapsed.Nanoseconds()) / 1e6
-			info["sql"] = sql
-			if rows == -1 {
-				info["rows"] = "-"
-				syslog.Info(c, "Sql Result", info)
-			} else {
-				info["rows"] = rows
-				syslog.Info(c, "Sql Result", info)
-			}
+	if l.LogLevel == 0 {
+		return
+	}
+
+	elapsed := time.Since(begin)
+	traceID, _ := ctx.Value(types.ContextTraceID).(string)
+
+	switch {
+	case err != nil && l.LogLevel >= logger.Error:
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return
 		}
+		logSQL(logrus.ErrorLevel, traceID, elapsed, err, fc)
+	case elapsed > l.SlowThreshold && l.SlowThreshold != 0 && l.LogLevel >= logger.Warn:
+		logSQL(logrus.WarnLevel, traceID, elapsed, fmt.Sprintf("SLOW SQL >= %v", l.SlowThreshold), fc)
+	case l.LogLevel >= logger.Info:
+		logSQL(logrus.InfoLevel, traceID, elapsed, nil, fc)
+	}
+}
+
+func logSQL(level logrus.Level, traceID string, elapsed time.Duration, sqlErr interface{}, fc func() (string, int64)) {
+	sql, rows := fc()
+	rowsValue := fmt.Sprintf("%d", rows)
+	if rows == -1 {
+		rowsValue = "-"
+	}
+
+	entry := logrus.WithFields(logrus.Fields{
+		"file": utils.FileWithLineNum(),
+		"rows": rowsValue,
+		"sql":  sql,
+	})
+	if traceID != "" {
+		entry = entry.WithField("traceId", traceID)
+	}
+	if sqlErr != nil {
+		entry = entry.WithField("error", sqlErr)
+	}
+
+	elapsedMS := fmt.Sprintf("%.2fms", float64(elapsed.Nanoseconds())/1e6)
+	switch level {
+	case logrus.ErrorLevel:
+		entry.Errorf("[SQL Error] %s", elapsedMS)
+	case logrus.WarnLevel:
+		entry.Warnf("[SQL Slow] %s", elapsedMS)
+	default:
+		entry.Infof("[SQL] %s", elapsedMS)
 	}
 }

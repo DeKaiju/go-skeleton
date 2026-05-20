@@ -1,52 +1,66 @@
 # go-skeleton
 
-## Run
+`go-skeleton` is a reusable Go backend template with a clean service layout and minimal sample auth flow.
+
+## Features
+
+- `cmd/` plus `service/server/` layering for CLI and HTTP services
+- Gin, Cobra, GORM, and optional Redis integration
+- Consistent logging, `traceId`, response formatting, and graceful shutdown
+- Sample Web3 auth flow: `nonce -> SIWE login -> JWT auth`
+- Self-contained HTTP and Redis test examples
+
+## Project Layout
+
+```text
+.
+├── cmd/                    # CLI entry points
+├── config/                 # environment and config helpers
+├── data/                   # models and DAO helpers
+├── pkg/                    # shared infrastructure packages
+├── service/server/         # HTTP service layers
+│   ├── handler/
+│   ├── logic/
+│   ├── middleware/
+│   └── route/
+├── test/                   # sample tests
+└── types/                  # shared constants and errors
+```
+
+## Quick Start
+
+1. Copy the environment template:
 
 ```bash
-// env
 cp .env.example .env
-
-// build
-go build main.go
-
-// cpu core number
-go build -ldflags "-X main.SetCpuCount=1" main.go
-
-// run server
-./main server
-
-// run script
-./main cmd demo hello
-./main cmd demo world
 ```
 
-## Test
+2. Start dependencies:
+
+- MySQL
+- Redis is optional and only needed for Redis-backed features such as the sample login session flow
+
+3. Start the API server:
 
 ```bash
-go get github.com/smartystreets/goconvey
-
-cd test/redis
-go test -v
-
-cd test/curl
-goconvey
+go run main.go server
 ```
 
-## Lib
+The default listen address is `:3000`.
 
-| Role     | Package     |   Link   |
-|----------|-------------| ---- |
-| Script   | cobra       |   https://github.com/spf13/cobra     |
-| Router   | gin         |   https://github.com/gin-gonic/gin     |
-| Env      | godotenv    |   https://github.com/joho/godotenv     |
-| ORM      | gorm        |   https://github.com/go-gorm/gorm      |
-| Redis    | redigo      |   https://github.com/gomodule/redigo   |
-| Curl     | goz         |   https://github.com/idoubi/goz        |
-| Json     | gjson       |   https://github.com/tidwall/gjson     |
-| Log      | logrus      |   https://github.com/sirupsen/logrus   |
-| JWT      | jwt-go      |   https://github.com/golang-jwt/jwt  |
-| Doc      | gin-swagger |   https://github.com/swaggo/gin-swagger |
-| Test     | goconvey    |   https://github.com/smartystreets/goconvey |
-| Kafka    | kafka-go    |   https://github.com/segmentio/kafka-go  |
-| RabbitMq | amqp        |   https://github.com/streadway/amqp  |
-| Etcd     | etcd        |   https://github.com/coreos/etcd/clientv3 |
+## Common Commands
+
+```bash
+go run main.go --help
+go run main.go server -c .env -p 3000 -m dev
+go run main.go cmd demo hello
+go test ./...
+```
+
+## Template Rules
+
+- `service/server/logic/` should not handle HTTP formatting details.
+- `handler/` should only bind input, call logic, and format responses.
+- `pkg/mysql` should propagate `traceId` into SQL logging.
+- Redis should stay optional at startup. Only features that explicitly need Redis should depend on it at runtime.
+- The template auto-migrates the sample `users` table to make first-run verification easier.

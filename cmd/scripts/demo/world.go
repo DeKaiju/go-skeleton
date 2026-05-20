@@ -1,11 +1,11 @@
 package demo
 
 import (
-	"fmt"
+	"github.com/dekaiju/go-skeleton/pkg/log"
 )
 
 func worldHandler(args []string) error {
-	fmt.Println(args)
-	fmt.Println("world")
+	log.Println(args)
+	log.Println("world")
 	return nil
 }

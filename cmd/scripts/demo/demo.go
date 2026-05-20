@@ -15,8 +15,8 @@ var (
 var (
 	hello = &cobra.Command{
 		Use: "hello",
-		PreRun: func(cmd *cobra.Command, args []string) {
-			common.Depend()
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			return common.Depend()
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return helloHandler(args)

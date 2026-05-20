@@ -1,24 +1,26 @@
 package middleware
 
 import (
-	"fmt"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
+
+	"github.com/dekaiju/go-skeleton/pkg/log"
 )
 
-// RecoverAtLast global exception handler
 func RecoverAtLast() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if r := recover(); r != nil {
-				c.JSON(500, gin.H{
-					"code":    5000,
-					"message": fmt.Sprintf("panic: %v", r),
+				log.Printf("panic recovered: %v", r)
+				c.JSON(http.StatusInternalServerError, gin.H{
 					"data":    "",
+					"message": "internal server error",
 				})
 				c.Abort()
 			}
 		}()
+
 		c.Next()
 	}
 }

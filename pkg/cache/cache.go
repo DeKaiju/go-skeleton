@@ -15,3 +15,7 @@ func Set(k string, v interface{}, d time.Duration) {
 func Get(k string) (interface{}, bool) {
 	return c.Get(k)
 }
+
+func Delete(k string) {
+	c.Delete(k)
+}

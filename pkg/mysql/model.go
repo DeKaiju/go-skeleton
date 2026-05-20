@@ -3,21 +3,21 @@ package mysql
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+
+	"github.com/dekaiju/go-skeleton/config"
+	"github.com/dekaiju/go-skeleton/pkg/log"
+	"github.com/dekaiju/go-skeleton/types"
 )
 
-// DB mysql connection pool
 var DB *gorm.DB
 
-// GetDB connects to database
 func GetDB() {
 	DB = connectDbMySQL(
 		os.Getenv("DB_HOST"),
@@ -27,14 +27,13 @@ func GetDB() {
 		os.Getenv("DB_PASSWORD"),
 		os.Getenv("DB_CHARSET"),
 	)
-	maxConnections, _ := strconv.Atoi(os.Getenv("DB_MAX_CONNECTIONS"))
-	openConnections, _ := strconv.Atoi(os.Getenv("DB_MAX_OPEN_CONNECTIONS"))
+
 	sqlDB, _ := DB.DB()
-	sqlDB.SetMaxOpenConns(maxConnections)
-	sqlDB.SetMaxIdleConns(openConnections)
+	sqlDB.SetMaxOpenConns(config.GetIntEnv("DB_MAX_OPEN_CONNECTIONS", 10))
+	sqlDB.SetMaxIdleConns(config.GetIntEnv("DB_MAX_IDLE_CONNECTIONS", config.GetIntEnv("DB_MAX_CONNECTIONS", 10)))
+	sqlDB.SetConnMaxLifetime(time.Hour)
 }
 
-// InitializeMysqlDB initializes mysql database
 func connectDbMySQL(host, port, database, user, pass, charset string) *gorm.DB {
 	dns := fmt.Sprintf(
 		"%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local",
@@ -46,21 +45,38 @@ func connectDbMySQL(host, port, database, user, pass, charset string) *gorm.DB {
 		charset,
 	)
 
+	sqlLogLevel := logger.Info
+	if !config.GetBoolEnv("DB_LOG", true) {
+		sqlLogLevel = logger.Error
+	}
+
 	db, err := gorm.Open(mysql.Open(dns), &gorm.Config{
-		Logger: NewTraceLogger(logger.Info, time.Second),
+		Logger: NewTraceLogger(sqlLogLevel, time.Second),
 	})
 	if err != nil {
 		log.Fatalf("models.InitDbMySQL err: %v", err)
 	}
+
 	return db
 }
 
-// GetInstance returns database instance
-func Instance(c *gin.Context) *gorm.DB {
-	return DB.WithContext(Gin2Context(c))
+func Instance(ctx context.Context) *gorm.DB {
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	return DB.WithContext(ctx)
 }
 
-// Append traceId to context
-func Gin2Context(c *gin.Context) context.Context {
-	return context.WithValue(context.Background(), "traceId", c.GetString("traceId"))
+func GinContextToContext(c *gin.Context) context.Context {
+	if c == nil {
+		return context.Background()
+	}
+
+	ctx := c.Request.Context()
+	if traceID := c.GetString(types.ContextTraceID); traceID != "" {
+		ctx = context.WithValue(ctx, types.ContextTraceID, traceID)
+	}
+
+	return ctx
 }

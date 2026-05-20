@@ -1,26 +1,21 @@
 package cmd
 
 import (
-	"errors"
 	"os"
+
+	"github.com/spf13/cobra"
 
 	"github.com/dekaiju/go-skeleton/cmd/api"
 	"github.com/dekaiju/go-skeleton/cmd/scripts"
-
-	"github.com/spf13/cobra"
 )
 
 var rootCmd = &cobra.Command{
-	Use:          "entry",
-	SilenceUsage: false,
-	Args: func(cmd *cobra.Command, args []string) error {
-		if len(args) < 1 {
-			return errors.New("requires at least one arg")
-		}
-		return nil
+	Use:          "go-skeleton",
+	Short:        "A reusable Go service skeleton",
+	SilenceUsage: true,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return cmd.Help()
 	},
-	PersistentPreRunE: func(*cobra.Command, []string) error { return nil },
-	Run:               func(cmd *cobra.Command, args []string) {},
 }
 
 func init() {
@@ -30,6 +25,6 @@ func init() {
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		os.Exit(-1)
+		os.Exit(1)
 	}
 }

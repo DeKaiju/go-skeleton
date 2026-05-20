@@ -1,11 +1,11 @@
 package demo
 
 import (
-	"fmt"
+	"github.com/dekaiju/go-skeleton/pkg/log"
 )
 
 func helloHandler(args []string) error {
-	fmt.Println(args)
-	fmt.Println("Hello")
+	log.Println(args)
+	log.Println("Hello")
 	return nil
 }

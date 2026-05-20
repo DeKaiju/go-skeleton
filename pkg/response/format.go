@@ -1,25 +1,26 @@
 package response
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 )
 
-// Success response success
 func Success(c *gin.Context, data interface{}) {
-	c.JSON(200, gin.H{
-		"code":    0,
-		"message": "",
+	c.JSON(http.StatusOK, gin.H{
 		"data":    data,
-		"traceid": c.GetString("traceId"),
+		"message": "",
 	})
 }
 
-// Fail response err message
-func Fail(c *gin.Context, err error) {
-	c.JSON(200, gin.H{
-		"code":    getCodeByError(err),
-		"message": err.Error(),
+func Fail(c *gin.Context, code int, err error) {
+	message := ""
+	if err != nil {
+		message = err.Error()
+	}
+
+	c.JSON(code, gin.H{
 		"data":    "",
-		"traceid": c.GetString("traceId"),
+		"message": message,
 	})
 }

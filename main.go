@@ -1,11 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"runtime"
 	"strconv"
 
 	"github.com/dekaiju/go-skeleton/cmd"
+	"github.com/dekaiju/go-skeleton/pkg/log"
 )
 
 var (
@@ -13,15 +13,15 @@ var (
 )
 
 // @title go-skeleton
-// @version 1.0
-// @description Golang skeleton
+// @version 2.0
+// @description Go service skeleton with a reusable backend project structure
 // @termsOfService https://github.com/dekaiju/go-skeleton
 func main() {
 	if SetCpuCount != "" {
 		procsNum, err := strconv.Atoi(SetCpuCount)
 		if err == nil {
 			runtime.GOMAXPROCS(procsNum)
-			fmt.Printf("GOMAXPROCS num set %v\n", procsNum)
+			log.Printf("GOMAXPROCS set to %d", procsNum)
 		}
 	}
 	cmd.Execute()
